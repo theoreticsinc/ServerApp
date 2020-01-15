@@ -44,7 +44,7 @@ public class Main {
     private void processCRDPLTonServer() {
         try {
             SystemStatus ss = new SystemStatus();
-            List<String> clients = DBH.getClientsIP();
+            List<String> clients = DBH.getClientsIP("forduplication");
 
             Iterator<String> iterator = clients.iterator();
             while (iterator.hasNext()) {
@@ -55,11 +55,21 @@ public class Main {
                 if (ss.checkPING(ip)) {
                     System.out.println(ip + " is Online");
                     if (null != date_lk) {
-                        DBH.copyCardsServer2POS("forduplication", date_lk, ip, clients);
+                        try {
+                            //DBH.copyCardsServer2POS("crdplt", "forduplication", date_lk, ip, clients);
+                            DBH.copyCardsServer2POS("extcrd", "forduplication", date_lk, ip, clients);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        try {
+                            DBH.copyFailedCardsServer2POS("extcrd", "forduplication", date_lk, ip, clients);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
